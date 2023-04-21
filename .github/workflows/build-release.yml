@@ -1,5 +1,6 @@
 name: Build Releases
 on:
+  workflow_dispatch:
   push:
     tags:
       - v*
@@ -11,17 +12,19 @@ env:
 jobs:
   build-cross:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       RUST_BACKTRACE: full
     strategy:
       matrix:
         target:
           - x86_64-unknown-linux-musl
-          - aarch64-unknown-linux-musl
           - armv7-unknown-linux-musleabihf
-          - arm-unknown-linux-musleabi
+          - aarch64-unknown-linux-musl
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -37,42 +40,13 @@ jobs:
         run: |
           cross build --release --target ${{ matrix.target }} &&
           mv target/${{ matrix.target }}/release/shadow-tls target/${{ matrix.target }}/release/shadow-tls-${{ matrix.target }}
+      - name: Get latest tag name
+        run: echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
       - name: Upload Github Assets
         uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: target/${{ matrix.target }}/release/shadow-tls-${{ matrix.target }}
-          prerelease: ${{ contains(github.ref, '-') }}
-  build-unix:
-    runs-on: ${{ matrix.os }}
-    env:
-      RUST_BACKTRACE: full
-    strategy:
-      matrix:
-        os: [macos-latest]
-        target:
-          - x86_64-apple-darwin
-          - aarch64-apple-darwin
-    steps:
-      - uses: actions/checkout@v2
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          target: ${{ matrix.target }}
-          toolchain: nightly
-          default: true
-          override: true
-      - name: Build release
-        shell: bash
-        run: |
-          cargo build --release --target ${{ matrix.target }} &&
-          mv target/${{ matrix.target }}/release/shadow-tls target/${{ matrix.target }}/release/shadow-tls-${{ matrix.target }}
-      - name: Upload Github Assets
-        uses: softprops/action-gh-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          files: target/${{ matrix.target }}/release/shadow-tls-${{ matrix.target }}
+          tag_name: ${{ env.TAG_NAME }}
           prerelease: ${{ contains(github.ref, '-') }}
