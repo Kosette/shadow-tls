@@ -1,6 +1,8 @@
 //! Stream wrapper to calculate hmac.
 //! All structs in this file is used by V2 protocol only.
 
+#![allow(unused)]
+
 use std::{
     cell::RefCell,
     future::Future,

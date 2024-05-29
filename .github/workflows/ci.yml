@@ -3,8 +3,8 @@ name: CI
 on:
   push:
     paths-ignore:
-      - '**.md'
-      - '**.png'
+      - "**.md"
+      - "**.png"
 
 env:
   RUST_TOOLCHAIN: nightly
@@ -17,75 +17,59 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: ${{ env.TOOLCHAIN_PROFILE }}
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          override: true
-          components: rustfmt, clippy
-      - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: actions/checkout@v4
+
+      - name: Install nightly toolchain
+        run: |
+          rustup default nightly
+
       - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all -- --check
+        run: |
+          cargo fmt --all -- --check
+
       - name: Run cargo check with no default features
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --no-default-features
+        run: |
+          cargo check --no-default-features
+
       - name: Run cargo check with all features
-        uses: actions-rs/cargo@v1
-        with:
-          command: check
-          args: --all-features
+        run: |
+          cargo check --all-features
+
       - name: Run cargo clippy
-        uses: actions-rs/cargo@v1
-        with:
-          command: clippy
-          args: -- -D warnings
+        run: |
+          cargo clippy -- -Dwarnings
+
   test:
     name: Run cargo test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: ${{ env.TOOLCHAIN_PROFILE }}
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          override: true
-      - name: Cache
-        uses: Swatinem/rust-cache@v1
+        run: |
+          rustup default nightly
+
       - name: Run cargo test --no-run
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all-features --no-run
+        run: |
+          cargo test --all-features --no-run
+
       - name: Run cargo test
-        run: sudo bash -c "ulimit -Sl 512 && ulimit -Hl 512 && sudo -u runner RUSTUP_TOOLCHAIN=nightly /home/runner/.cargo/bin/cargo test --all-features"
+        run: >
+          ulimit -Sl 512 && ulimit -Hl 512 &&
+          RUSTUP_TOOLCHAIN=nightly cargo test --all-features
 
   test-macos:
     name: Run cargo test on macos
     runs-on: macos-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: ${{ env.TOOLCHAIN_PROFILE }}
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
-          override: true
-      - name: Cache
-        uses: Swatinem/rust-cache@v1
+        run: |
+          rustup default nightly
+
       - name: Run cargo test
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --all-features
-          toolchain: ${{ env.RUST_TOOLCHAIN }}
+        run: |
+          cargo test --all-features

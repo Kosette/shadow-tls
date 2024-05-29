@@ -29,20 +29,20 @@ jobs:
       - name: Install toolchain
         run: |
           rustup set profile minimal
-          rustup default nightly-${{ matrix.target }}
+          rustup default nightly
 
       - name: Install cross
         run: cargo install cross
-      
+
       - name: Build ${{ matrix.target }}
         timeout-minutes: 120
         run: |
           cross build --release --target ${{ matrix.target }} &&
           mv target/${{ matrix.target }}/release/shadow-tls target/${{ matrix.target }}/release/shadow-tls-${{ matrix.target }}
-      
+
       - name: Get latest tag name
         run: echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
-      
+
       - name: Upload Github Assets
         uses: softprops/action-gh-release@v2
         env:
