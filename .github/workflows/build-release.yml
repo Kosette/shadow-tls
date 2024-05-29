@@ -24,26 +24,29 @@ jobs:
           - aarch64-unknown-linux-musl
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-      - name: Install Rust
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          target: ${{ matrix.target }}
-          toolchain: nightly
-          default: true
-          override: true
+        uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          rustup set profile minimal
+          rustup default nightly
+
       - name: Install cross
-        run: cargo install cross
+        run: |
+          cargo install cross --git "https://github.com/cross-rs/cross" --rev "d8631fe4f4e8bb4c4b24417a35544857fb42ee22" &&
+          cargo clean
+
       - name: Build ${{ matrix.target }}
         timeout-minutes: 120
         run: |
           cross build --release --target ${{ matrix.target }} &&
           mv target/${{ matrix.target }}/release/shadow-tls target/${{ matrix.target }}/release/shadow-tls-${{ matrix.target }}
+
       - name: Get latest tag name
         run: echo "TAG_NAME=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+
       - name: Upload Github Assets
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:

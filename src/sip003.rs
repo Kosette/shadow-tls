@@ -6,7 +6,7 @@ pub fn parse_sip003_options(s: &str) -> Result<Vec<(String, String)>, anyhow::Er
     let mut i = 0;
     while i < s.len() {
         // read key
-        let (offset, key) = index_unescaped(&s[i..], &[b'=', b';']).context("read key")?;
+        let (offset, key) = index_unescaped(&s[i..], b"=;").context("read key")?;
         if key.is_empty() {
             bail!("empty key in {}", &s[i..]);
         }
@@ -21,7 +21,7 @@ pub fn parse_sip003_options(s: &str) -> Result<Vec<(String, String)>, anyhow::Er
         // skip equals
         i += 1;
         // read value
-        let (offset, value) = index_unescaped(&s[i..], &[b'=', b';']).context("read value")?;
+        let (offset, value) = index_unescaped(&s[i..], b"=;").context("read value")?;
         i += offset;
         opts.push((key, value));
         // Skip the semicolon.
