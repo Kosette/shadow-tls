@@ -1,10 +1,11 @@
 name: CI
 
 on:
-  push:
-    paths-ignore:
-      - "**.md"
-      - "**.png"
+  workflow_dispatch:
+#  push:
+#    paths-ignore:
+#      - "**.md"
+#      - "**.png"
 
 env:
   RUST_TOOLCHAIN: nightly

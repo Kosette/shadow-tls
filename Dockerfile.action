@@ -1,12 +1,12 @@
-FROM alpine:latest as builder
+FROM ubuntu:24.04 as builder
 
 ARG DOWNLOAD_BASE
-RUN ARCH=$(uname -m | sed -e "s/armv7l/armv7-unknown-linux-musleabihf/g" | sed -e "s/aarch64/aarch64-unknown-linux-musl/g" | sed -e "s/x86_64/x86_64-unknown-linux-musl/g") && \
-    apk add --no-cache curl && \
+RUN ARCH=$(uname -m | sed -e "s/armv7l/armv7-unknown-linux-musleabihf/g" | sed -e "s/aarch64/aarch64-unknown-linux-musl/g" | sed -e "s/x86_64/x86_64-unknown-linux-gnu/g") && \
+    apt install -y curl && \
     curl -L "${DOWNLOAD_BASE}/shadow-tls-${ARCH}" -o /shadow-tls && \
     chmod +x /shadow-tls
 
-FROM alpine:latest
+FROM ubuntu:24.04
 
 ENV MODE=""
 ENV LISTEN=""
@@ -21,6 +21,6 @@ ENV V3=""
 ENV STRICT=""
 
 COPY ./entrypoint.sh /
-RUN chmod +x /entrypoint.sh && apk add --no-cache ca-certificates
+RUN chmod +x /entrypoint.sh && apt install -y ca-certificates
 COPY --from=builder /shadow-tls /usr/local/bin/shadow-tls
 ENTRYPOINT ["/entrypoint.sh"]

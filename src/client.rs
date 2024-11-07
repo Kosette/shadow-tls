@@ -69,7 +69,7 @@ impl TryFrom<&str> for TlsNames {
 
 struct TlsNamesVisitor;
 
-impl<'de> Visitor<'de> for TlsNamesVisitor {
+impl Visitor<'_> for TlsNamesVisitor {
     type Value = TlsNames;
     fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
         formatter.write_str("a semicolon seperated list of domains and ip addresses")
