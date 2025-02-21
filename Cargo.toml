@@ -1,7 +1,7 @@
 [package]
 authors = ["ihciah <ihciah@gmail.com>"]
 description = "A proxy to expose real tls handshake to the MITM."
-edition = "2021"
+edition = "2024"
 keywords = ["proxy", "tls", "shadowsocks"]
 license = "MIT/Apache-2.0"
 name = "shadow-tls"
@@ -21,8 +21,8 @@ ctrlc = { version = "3", features = ["termination"] }
 hmac = "0.12"
 local-sync = "0.1"
 pin-project-lite = "0.2"
-rand = "0.8"
-rustc-hash = "1"
+rand = "0.9"
+rustc-hash = "2"
 sha1 = "0.10"
 sha2 = "0.10"
 tracing = "0.1"

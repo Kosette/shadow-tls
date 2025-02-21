@@ -385,7 +385,7 @@ async fn send_alert(mut w: impl AsyncWriteRent, alert_enabled: bool) {
 
     let mut buf = vec![0; FULL_SIZE as usize];
     unsafe { copy_nonoverlapping(HEADER.as_ptr(), buf.as_mut_ptr(), HEADER.len()) };
-    rand::thread_rng().fill(&mut buf[HEADER.len()..]);
+    rand::rng().fill(&mut buf[HEADER.len()..]);
 
     let _ = w.write_all(buf).await;
 }
