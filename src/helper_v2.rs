@@ -16,12 +16,12 @@ use std::{
 
 use hmac::Mac;
 use monoio::{
+    BufResult,
     buf::{IoBuf, IoBufMut, IoVecWrapper, IoVecWrapperMut},
     io::{
-        as_fd::{AsReadFd, AsWriteFd},
         AsyncReadRent, AsyncReadRentExt, AsyncWriteRent, AsyncWriteRentExt,
+        as_fd::{AsReadFd, AsWriteFd},
     },
-    BufResult,
 };
 
 use crate::util::prelude::*;

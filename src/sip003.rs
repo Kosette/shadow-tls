@@ -1,4 +1,4 @@
-use anyhow::{bail, Context};
+use anyhow::{Context, bail};
 
 // Parse SIP003 optinos from env
 pub fn parse_sip003_options(s: &str) -> Result<Vec<(String, String)>, anyhow::Error> {

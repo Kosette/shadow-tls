@@ -8,24 +8,24 @@ use std::{
 use anyhow::bail;
 use byteorder::{BigEndian, WriteBytesExt};
 use monoio::{
+    BufResult,
     buf::IoBufMut,
     io::{AsyncReadRent, AsyncReadRentExt, AsyncWriteRent, AsyncWriteRentExt, Splitable},
     net::{TcpConnectOpts, TcpStream},
-    BufResult,
 };
 use monoio_rustls_fork_shadow_tls::TlsConnector;
 use rand::{
-    prelude::{Distribution, IndexedRandom},
     Rng,
+    prelude::{Distribution, IndexedRandom},
 };
 use rustls_fork_shadow_tls::{OwnedTrustAnchor, RootCertStore, ServerName};
-use serde::{de::Visitor, Deserialize};
+use serde::{Deserialize, de::Visitor};
 
 use crate::{
-    helper_v2::{copy_with_application_data, copy_without_application_data, HashedReadStream},
+    helper_v2::{HashedReadStream, copy_with_application_data, copy_without_application_data},
     util::{
-        bind_with_pretty_error, kdf, mod_tcp_conn, prelude::*, resolve, support_tls13,
-        verified_relay, xor_slice, Hmac, V3Mode,
+        Hmac, V3Mode, bind_with_pretty_error, kdf, mod_tcp_conn, prelude::*, resolve,
+        support_tls13, verified_relay, xor_slice,
     },
 };
 

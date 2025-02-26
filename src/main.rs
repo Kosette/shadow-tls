@@ -3,11 +3,11 @@
 use std::{collections::HashMap, path::PathBuf, process::exit};
 
 use clap::{Parser, Subcommand, ValueEnum};
-use tracing_subscriber::{filter::LevelFilter, fmt, prelude::*, EnvFilter};
+use tracing_subscriber::{EnvFilter, filter::LevelFilter, fmt, prelude::*};
 
 use shadow_tls::{
-    sip003::parse_sip003_options, RunningArgs, TlsAddrs, TlsExtConfig, TlsNames, V3Mode,
-    WildcardSNI,
+    RunningArgs, TlsAddrs, TlsExtConfig, TlsNames, V3Mode, WildcardSNI,
+    sip003::parse_sip003_options,
 };
 
 use serde::Deserialize;
