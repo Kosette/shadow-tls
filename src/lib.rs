@@ -1,5 +1,3 @@
-#![feature(impl_trait_in_assoc_type)]
-
 mod client;
 mod helper_v2;
 mod server;

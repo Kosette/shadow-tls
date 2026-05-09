@@ -18,13 +18,13 @@ anyhow = "1"
 byteorder = "1"
 clap = { version = "4", features = ["derive"] }
 ctrlc = { version = "3", features = ["termination"] }
-hmac = "0.12"
+hmac = "0.13"
 local-sync = "0.1"
 pin-project-lite = "0.2"
-rand = "0.9"
+rand = "0.10"
 rustc-hash = "2"
-sha1 = "0.10"
-sha2 = "0.10"
+sha1 = "0.11"
+sha2 = "0.11"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 webpki-roots = "1.0"

@@ -14,7 +14,7 @@ use std::{
     task::{Context, Poll},
 };
 
-use hmac::Mac;
+use hmac::{KeyInit, Mac};
 use monoio::{
     BufResult,
     buf::{IoBuf, IoBufMut, IoVecWrapper, IoVecWrapperMut},
@@ -28,6 +28,7 @@ use crate::util::prelude::*;
 
 pub(crate) const HMAC_SIZE_V2: usize = 8;
 
+#[allow(unused)]
 pub(crate) trait HashedStream {
     fn hash_stream(&self) -> [u8; 20];
 }
@@ -100,6 +101,7 @@ impl<S> HashedWriteStream<S> {
         })
     }
 
+    #[allow(unused)]
     pub(crate) fn hash(&self) -> [u8; 20] {
         self.hmac
             .borrow()
@@ -407,20 +409,20 @@ where
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
         let this = self.project();
-        if this.slot_a.is_none() {
-            if let Poll::Ready(r) = this.future_a.poll(cx) {
-                match r {
-                    Ok(a) => *this.slot_a = Some(a),
-                    Err(e) => return Poll::Ready(Err(e)),
-                }
+        if this.slot_a.is_none()
+            && let Poll::Ready(r) = this.future_a.poll(cx)
+        {
+            match r {
+                Ok(a) => *this.slot_a = Some(a),
+                Err(e) => return Poll::Ready(Err(e)),
             }
         }
-        if this.slot_b.is_none() {
-            if let Poll::Ready(r) = this.future_b.poll(cx) {
-                match r {
-                    Ok(b) => *this.slot_b = Some(b),
-                    Err(e) => return Poll::Ready(Err(e)),
-                }
+        if this.slot_b.is_none()
+            && let Poll::Ready(r) = this.future_b.poll(cx)
+        {
+            match r {
+                Ok(b) => *this.slot_b = Some(b),
+                Err(e) => return Poll::Ready(Err(e)),
             }
         }
         if this.slot_a.is_some() && this.slot_b.is_some() {
@@ -485,12 +487,12 @@ where
             };
             return Poll::Ready(r.map(|r| (r, b)));
         }
-        if this.slot_b.is_none() {
-            if let Poll::Ready(r) = this.future_b.as_pin_mut().unwrap().poll(cx) {
-                match r {
-                    Ok(r) => *this.slot_b = Some(r),
-                    Err(e) => return Poll::Ready(Err(e)),
-                }
+        if this.slot_b.is_none()
+            && let Poll::Ready(r) = this.future_b.as_pin_mut().unwrap().poll(cx)
+        {
+            match r {
+                Ok(r) => *this.slot_b = Some(r),
+                Err(e) => return Poll::Ready(Err(e)),
             }
         }
         Poll::Pending

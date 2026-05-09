@@ -15,7 +15,7 @@ use monoio::{
 };
 use monoio_rustls_fork_shadow_tls::TlsConnector;
 use rand::{
-    Rng,
+    RngExt,
     prelude::{Distribution, IndexedRandom},
 };
 use rustls_fork_shadow_tls::{OwnedTrustAnchor, RootCertStore, ServerName};
@@ -440,26 +440,26 @@ impl<S: AsyncReadRent> StreamWrapper<S> {
             }
             APPLICATION_DATA => {
                 self.read_authorized = false;
-                if buf.len() > TLS_HMAC_HEADER_SIZE {
-                    if let Some(State { hmac, key, .. }) = self.read_state.as_mut() {
-                        hmac.update(&buf[TLS_HMAC_HEADER_SIZE..]);
-                        if hmac.finalize() == buf[TLS_HEADER_SIZE..TLS_HMAC_HEADER_SIZE] {
-                            xor_slice(&mut buf[TLS_HMAC_HEADER_SIZE..], key);
-                            unsafe {
-                                copy(
-                                    buf.as_ptr().add(TLS_HMAC_HEADER_SIZE),
-                                    buf.as_mut_ptr().add(5),
-                                    buf.len() - 9,
-                                )
-                            };
-                            (&mut buf[3..5])
-                                .write_u16::<BigEndian>(data_size as u16 - HMAC_SIZE as u16)
-                                .unwrap();
-                            unsafe { buf.set_init(buf.len() - HMAC_SIZE) };
-                            self.read_authorized = true;
-                        } else {
-                            tracing::debug!("app data verification failed");
-                        }
+                if buf.len() > TLS_HMAC_HEADER_SIZE
+                    && let Some(State { hmac, key, .. }) = self.read_state.as_mut()
+                {
+                    hmac.update(&buf[TLS_HMAC_HEADER_SIZE..]);
+                    if hmac.finalize() == buf[TLS_HEADER_SIZE..TLS_HMAC_HEADER_SIZE] {
+                        xor_slice(&mut buf[TLS_HMAC_HEADER_SIZE..], key);
+                        unsafe {
+                            copy(
+                                buf.as_ptr().add(TLS_HMAC_HEADER_SIZE),
+                                buf.as_mut_ptr().add(5),
+                                buf.len() - 9,
+                            )
+                        };
+                        (&mut buf[3..5])
+                            .write_u16::<BigEndian>(data_size as u16 - HMAC_SIZE as u16)
+                            .unwrap();
+                        unsafe { buf.set_init(buf.len() - HMAC_SIZE) };
+                        self.read_authorized = true;
+                    } else {
+                        tracing::debug!("app data verification failed");
                     }
                 }
             }

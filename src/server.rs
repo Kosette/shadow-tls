@@ -81,7 +81,7 @@ impl TryFrom<&str> for TlsAddrs {
         let mut rev_parts = arg.split(';').rev();
         let fallback = rev_parts
             .next()
-            .and_then(|x| if x.trim().is_empty() { None } else { Some(x) })
+            .filter(|&x| !x.trim().is_empty())
             .ok_or_else(|| anyhow::anyhow!("empty server addrs"))?;
         let fallback = if !fallback.contains(':') {
             format!("{fallback}:443")

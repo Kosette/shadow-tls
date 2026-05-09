@@ -13,8 +13,8 @@ use monoio::{
     net::{ListenerOpts, TcpListener, TcpStream},
 };
 
-use hmac::Mac;
-use rand::Rng;
+use hmac::{KeyInit, Mac};
+use rand::RngExt;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 
@@ -74,10 +74,13 @@ impl V3Mode {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Debug, clap::ValueEnum, Deserialize)]
+#[derive(
+    Copy, Clone, Default, PartialEq, Eq, PartialOrd, Ord, Debug, clap::ValueEnum, Deserialize,
+)]
 pub enum WildcardSNI {
     /// Disabled
     #[serde(rename = "off")]
+    #[default]
     Off,
     /// For authenticated client only(may be differentiable); in v2 protocol it is eq to all.
     #[serde(rename = "authed")]
@@ -85,12 +88,6 @@ pub enum WildcardSNI {
     /// For all request(may cause service abused but not differentiable)
     #[serde(rename = "all")]
     All,
-}
-
-impl Default for WildcardSNI {
-    fn default() -> Self {
-        Self::Off
-    }
 }
 
 impl std::fmt::Display for WildcardSNI {
